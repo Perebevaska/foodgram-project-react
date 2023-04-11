@@ -29,8 +29,7 @@ class UserAdmin(ImportExportModelAdmin):
         'email',
         'first_name',
         'last_name',
-        'bio',
-        'role',
+        'role'
     )
     search_fields = ('username',)
     list_filter = ('username',)

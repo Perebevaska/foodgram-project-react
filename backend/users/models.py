@@ -28,8 +28,7 @@ class User(AbstractUser):
         validators=[username_validator, validate_me_name],
         error_messages={
             'unique': 'A user with that username already exists.',
-        },
-        pattern=r'^[\w.@+-]+\z'
+        }
     )
     email = models.EmailField(
         verbose_name='Электронная почта',
@@ -38,8 +37,8 @@ class User(AbstractUser):
     )
     role = models.CharField(
         verbose_name='Роль',
-        max_length=settings.LEN_ROLE,
-        choices=20,
+        max_length=20,
+        choices=ROLE_CHOICES,
         default=USER,
     )
     first_name = models.CharField(
