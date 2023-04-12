@@ -30,6 +30,10 @@ class User(AbstractUser):
             'unique': 'A user with that username already exists.',
         }
     )
+    password = models.CharField(
+        verbose_name='Пароль',
+        max_length=128
+    )
     email = models.EmailField(
         verbose_name='Электронная почта',
         max_length=254,

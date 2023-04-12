@@ -29,7 +29,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
-    'dj_rest_auth',
+    'djoser',
 
     'import_export',
 
@@ -136,3 +136,6 @@ REST_FRAMEWORK = {
     #],
 }
 
+REST_AUTH = {
+    'REGISTER_SERIALIZER': 'backend.api.serialyzers.CustomRegisterSerializer',
+}
