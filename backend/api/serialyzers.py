@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from ..users.models import User
+from users.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from ..users.validators import validate_me_name
+from users.validators import validate_me_name
 
 
 
