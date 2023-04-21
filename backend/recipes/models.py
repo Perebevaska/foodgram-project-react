@@ -12,7 +12,6 @@ class Ingredient(models.Model):
     )
     quantity = models.IntegerField(
         verbose_name='Количество',
-        max_length=4,
         blank=False
     )
     measure_unit = models.SlugField(

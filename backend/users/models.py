@@ -7,15 +7,7 @@ from users.validators import validate_me_name
 
 
 class User(AbstractUser):
-    USER = 'user'
-    MODERATOR = 'moderator'
-    ADMIN = 'admin'
 
-    ROLE_CHOICES = [
-        (USER, 'Пользователь'),
-        (MODERATOR, 'Модератор'),
-        (ADMIN, 'Администратор')
-    ]
     username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(
@@ -23,11 +15,11 @@ class User(AbstractUser):
         max_length=150,
         unique=True,
         help_text=(
-            'Required. 150 characters or fewer. '
-            'Letters, digits and @/./+/-/_ only.'),
+            'Обязательное поле. 150 символов максимум. '
+            'Только буквы, цифры и @/./+/-/_.'),
         validators=[username_validator, validate_me_name],
         error_messages={
-            'unique': 'A user with that username already exists.',
+            'unique': 'Пользователь с таким именем уже существует.',
         }
     )
     password = models.CharField(
@@ -39,12 +31,6 @@ class User(AbstractUser):
         max_length=254,
         unique=True
     )
-    role = models.CharField(
-        verbose_name='Роль',
-        max_length=20,
-        choices=ROLE_CHOICES,
-        default=USER,
-    )
     first_name = models.CharField(
         verbose_name='Имя',
         max_length=150,
@@ -55,14 +41,6 @@ class User(AbstractUser):
         max_length=150,
         blank=True
     )
-
-    @property
-    def is_admin(self):
-        return self.role == self.ADMIN or self.is_superuser
-
-    @property
-    def is_moderator(self):
-        return self.role == self.MODERATOR or self.is_staff
 
     class Meta:
         verbose_name = 'Пользователь'
