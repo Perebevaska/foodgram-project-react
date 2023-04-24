@@ -6,7 +6,6 @@ from users.models import User
 
 
 class UserResource(resources.ModelResource):
-
     class Meta:
         model = User
         fields = (
@@ -33,3 +32,5 @@ class UserAdmin(ImportExportModelAdmin):
     search_fields = ('username',)
     list_filter = ('username',)
     empty_value_display = '-пусто-'
+
+
