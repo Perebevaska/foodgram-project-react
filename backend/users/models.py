@@ -35,6 +35,7 @@ class User(AbstractUser):
         unique=True,
         blank=False,
         null=False,
+        db_index=True,
     )
     first_name = models.CharField(
         verbose_name='Имя',
@@ -49,7 +50,11 @@ class User(AbstractUser):
         null=False,
     )
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username', 'first_name', 'last_name', 'password')
+
     class Meta:
+        ordering = ['-id']
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
@@ -71,6 +76,7 @@ class Subscription(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'author'],
