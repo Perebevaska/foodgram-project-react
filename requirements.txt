@@ -6,3 +6,4 @@ djoser==2.1.0
 requests==2.28.2
 pytz==2023.3
 pillow==9.5.0
+django-cors-headers==3.14.0

@@ -1,7 +1,7 @@
 from users.models import User
 from rest_framework import serializers
 from recipes.models import Tag, Ingredient, Recipe
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import UserSerializer
 
 #get
 class UserGetSerializer(UserSerializer):
