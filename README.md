@@ -1,6 +1,6 @@
 # Foodgram React
 
-![foodgram_workflow]
+![foodgram_workflow] work in progress
 
 ## Описание
 
