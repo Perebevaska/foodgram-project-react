@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'base64',
     'corsheaders',
     'djoser',
     'api',
@@ -111,12 +112,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-       'rest_framework.authentication.TokenAuthentication',]
-  #  'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-   # 'PAGE_SIZE': 5,
-   # 'DEFAULT_FILTER_BACKENDS': [
-   #     'rest_framework.filters.SearchFilter',
-    #],
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.SearchFilter',
+    ],
 }
 
 DJOSER = {
@@ -128,7 +130,7 @@ DJOSER = {
     },
     'HIDE_USERS': False,
     'PERMISSIONS': {
-        'user': ['api.permissions.AdminOrReadOnly'],
+        'user': ['api.permissions.AuthorOrReadOnly'],
         'user_list': ['rest_framework.permissions.AllowAny'],
         'user_delete': ['rest_framework.permissions.IsAdminUser'],
     },
