@@ -4,15 +4,13 @@ from django.db import models
 from users.models import User
 
 
-
 class Ingredient(models.Model):
     name = models.CharField(
         verbose_name='Название',
         max_length=255,
-        unique=True,
         blank=False
     )
-    measure_unit = models.SlugField(
+    measurement_unit = models.SlugField(
         verbose_name='Еденица измерения',
         max_length=255,
         blank=False
@@ -29,12 +27,7 @@ class Ingredient(models.Model):
         if not self.measure_unit:
             raise ValidationError('Единица измерения обязательна.')
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['name', 'measure_unit'], name='unique_ingredient'
-            )
-        ]
+
 
 
 

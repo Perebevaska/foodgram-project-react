@@ -1,10 +1,13 @@
 from django.db import transaction
-from users.models import User, Subscription
-from rest_framework import serializers
-from recipes.models import Tag, Ingredient, Recipe, Favorite, CartList, IngredientAmount
-from drf_base64.fields import Base64ImageField
 from django.shortcuts import get_object_or_404
+from drf_base64.fields import Base64ImageField
+from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
+                            Recipe, Tag)
+from rest_framework import serializers
+from users.models import Subscription, User
+
 from .validators import validate_ingredients, validate_tags
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
@@ -54,7 +57,13 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
         fields = '__all__'
 
+class ImageRecipeSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
 
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+        read_only_fields = ('id', 'name', 'image', 'cooking_time')
 
 
 

@@ -1,22 +1,19 @@
-from djoser.views import UserViewSet
-from users.models import User
-from recipes.models import Tag, Ingredient, Recipe, Favorite, IngredientAmount,CartList
-from rest_framework import viewsets
-from .serializers import TagsSerializer, IngredientSerializer, RecipeSerializer
-from rest_framework.permissions import AllowAny
-from .permissions import AuthorOrReadOnly
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
+from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
+                            Recipe, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-
-
+from users.models import User
 
 from .permissions import AuthorOrReadOnly
-from .serializers import RecipeSerializer, SmallRecipeSerializer
+from .serializers import IngredientSerializer, RecipeSerializer, TagsSerializer
+
 
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
@@ -35,6 +32,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     queryset = Recipe.objects.all()
     permission_classes = (AuthorOrReadOnly,)
+
+    def add(self, model, user, pk, name):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        relation = model.objects.filter(user=user, recipe=recipe)
+        if relation.exists():
+            return Response(
+                {'errors': f'Нельзя повторно добавить рецепт в {name}'},
+                status=status.HTTP_400_BAD_REQUEST)
+        model.objects.create(user=user, recipe=recipe)
+        serializer = SmallRecipeSerializer(recipe)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
