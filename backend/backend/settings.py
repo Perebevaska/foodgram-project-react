@@ -139,3 +139,6 @@ DJOSER = {
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
 
+PDF_FONT_NAME = 'OpenSans'
+PDF_FONT_PATH = 'https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf'
+PDF_FONT_SIZE = 14

@@ -1,8 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django_filters import ModelMultipleChoiceFilter
 from django_filters.rest_framework import FilterSet, filters
+
 from users.models import User
-from rest_framework.filters import SearchFilter
 
 from .models import Recipe, Tag
 

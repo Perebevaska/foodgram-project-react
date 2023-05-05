@@ -8,27 +8,19 @@ class Ingredient(models.Model):
     name = models.CharField(
         verbose_name='Название',
         max_length=255,
-        blank=False
     )
     measurement_unit = models.SlugField(
         verbose_name='Еденица измерения',
         max_length=255,
-        blank=False
     )
     verbose_name = 'Ингредиент'
     verbose_name_plural = 'Ингредиенты'
 
+    class Meta:
+        ordering = ('id',)
+
     def __str__(self):
         return self.name
-
-    def clean(self):
-        if not self.name:
-            raise ValidationError('Название ингредиента обязательно.')
-        if not self.measure_unit:
-            raise ValidationError('Единица измерения обязательна.')
-
-
-
 
 
 

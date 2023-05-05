@@ -1,4 +1,6 @@
+from django.core.cache import cache
 from django.db import transaction
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
@@ -49,13 +51,16 @@ class TagsSerializer(serializers.ModelSerializer):
     """Сериализатор для работы с тэгами."""
     class Meta:
         model = Tag
-        fields = '__all__'
+        fields = (
+            'id', 'name', 'color', 'slug'
+        )
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для работы с ингредиентами."""
     class Meta:
         model = Ingredient
-        fields = '__all__'
+        fields = ('__all__')
+
 
 class ImageRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
@@ -76,7 +81,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
-    @transaction.atomic
     def create(self, validated_data):
         valid_ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -85,7 +89,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         self.create_ingredient_amount(valid_ingredients, recipe)
         return recipe
 
-    @transaction.atomic
     def create_ingredient_amount(self, valid_ingredients, recipe):
         for ingredient_data in valid_ingredients:
             ingredient = get_object_or_404(
@@ -95,7 +98,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 ingredient=ingredient,
                 amount=ingredient_data.get('amount'))
 
-    @transaction.atomic
+
     def create_tags(self, data, recipe):
         valid_tags = validate_tags(data.get('tags'))
         tags = Tag.objects.filter(id__in=valid_tags)
@@ -117,7 +120,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         data['tags'] = data.get('tags', [])
         return data
 
-    @transaction.atomic
+
     def update(self, instance, validated_data):
         name = validated_data.get('name')
         image = validated_data.get('image')
@@ -144,4 +147,87 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'tags', 'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time'
+        )
+
+class RecipeWithImageSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+        read_only_fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='author.id')
+    username = serializers.ReadOnlyField(source='author.username')
+    email = serializers.ReadOnlyField(source='author.email')
+    first_name = serializers.ReadOnlyField(source='author.first_name')
+    last_name = serializers.ReadOnlyField(source='author.last_name')
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.ReadOnlyField(source='author.recipes.count')
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Subscription
+        fields = (
+            'email', 'id', 'username', 'first_name', 'last_name',
+            'is_subscribed', 'recipes', 'recipes_count'
+        )
+
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            return Subscription.objects.filter(
+                author=obj.author, user=user).exists()
+        return False
+
+    # def get_recipes(self, obj):
+    #     limit = self.context.get('request').GET.get('recipes_limit')
+    #     recipe_obj = obj.author.recipes.all()
+    #     if limit:
+    #         recipe_obj = recipe_obj[:int(limit)]
+    #     prefetch = Prefetch('recipeingredient_set__ingredient')
+    #     recipe_obj = recipe_obj.prefetch_related(prefetch)
+    #     serializer = RecipeWithImageSerializer(recipe_obj, many=True)
+    #     return serializer.data
+
+    # пробую кеширование
+
+    def get_recipes(self, obj):
+        limit = self.context.get('request').GET.get('recipes_limit')
+        cache_key = f"recipes_{obj.author.id}_{limit}"
+        data = cache.get(cache_key)
+        if data is None:
+            prefetch = Prefetch('recipeingredient_set__ingredient')
+            recipes = obj.author.recipes.all().prefetch_related(prefetch)
+            if limit:
+                limit = self.validate_integer(limit)
+                recipes = recipes[:limit]
+            serializer = RecipeWithImageSerializer(recipes, many=True)
+            data = serializer.data
+            cache.set(cache_key, data)
+        return data
+
+    def validate_integer(self, value):
+        try:
+            limit = int(value)
+            if limit < 1:
+                raise serializers.ValidationError('Количество рецептов должно быть больше 0')
+        except ValueError:
+            raise serializers.ValidationError('Число должно быть целым (integer).')
+        return limit
+
+
+
+class IngredientAmountSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit')
+
+    class Meta:
+        model = IngredientAmount
+        fields = (
+            'id', 'name', 'measurement_unit', 'amount'
         )

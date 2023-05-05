@@ -6,31 +6,22 @@ def validate_tags(self, tags):
     if not tags:
         raise serializers.ValidationError('Обязательное поле "tags".')
     tag_ids = set(tags)
+    if len(tag_ids) != len(tags):
+        raise serializers.ValidationError('Нельзя дублировать теги.')
     missing_tags = Tag.objects.filter(id__in=tag_ids).values_list('id', flat=True)
     if len(missing_tags) < len(tag_ids):
         invalid_tags = tag_ids - set(missing_tags)
         raise serializers.ValidationError(f'Теги {invalid_tags} не найдены.')
-    return tags
+    return list(tag_ids)
 
 def validate_ingredients(self, data):
     ingredients = data.get('ingredients')
     if not ingredients:
         raise serializers.ValidationError('Обязательное поле "ingredients".')
-    if len(ingredients) < 1:
-        raise serializers.ValidationError('Не переданы ингредиенты.')
-    unique_ingredient_ids = set()
-    for ingredient in ingredients:
-        ingredient_id = ingredient.get('id')
-        if not ingredient_id:
-            raise serializers.ValidationError('Отсутствует id ингредиента.')
-        if ingredient_id in unique_ingredient_ids:
-            raise serializers.ValidationError('Нельзя дублировать имена ингредиентов.')
-        unique_ingredient_ids.add(ingredient_id)
-    ingredient_ids = [ingredient.get('id') for ingredient in ingredients]
-    if not Ingredient.objects.filter(id__in=ingredient_ids).count() == len(ingredient_ids):
-        raise serializers.ValidationError('Ингредиенты не найдены.')
-    for ingredient in ingredients:
-        amount = ingredient.get('amount')
-        if not isinstance(amount, int) or amount < 1:
-            raise serializers.ValidationError('Количество должно быть целым числом больше 0.')
+    unique_ingredient_ids = set(ingredient['id'] for ingredient in ingredients)
+    if len(unique_ingredient_ids) != len(ingredients):
+        raise serializers.ValidationError('Нельзя дублировать ингредиенты.')
+    ingredient_ids = Ingredient.objects.filter(id__in=unique_ingredient_ids).values_list('id', flat=True)
+    if len(ingredient_ids) != len(unique_ingredient_ids):
+        raise serializers.ValidationError('Некоторые ингредиенты не найдены.')
     return data
