@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -23,27 +23,16 @@ class Ingredient(models.Model):
         return self.name
 
 
-
 class Tag(models.Model):
     name = models.CharField(
-        verbose_name='Название тега',
-        max_length=255,
-        blank=False,
-        unique=True
+        verbose_name='Название тега', max_length=255, blank=False, unique=True
     )
     color = models.CharField(
-        verbose_name='Цветовой HEX-код',
-        max_length=7,
-        blank=False,
-        unique=True
+        verbose_name='Цветовой HEX-код', max_length=7, blank=False, unique=True
     )
     slug = models.SlugField(
-        verbose_name='Slug',
-        max_length=255,
-        blank=False,
-        unique=True
+        verbose_name='Slug', max_length=255, blank=False, unique=True
     )
-
 
     class Meta:
         verbose_name = 'Тэг'
@@ -54,7 +43,10 @@ class Tag(models.Model):
 
     def clean(self):
         if self.name.lower() == self.color.lower():
-            raise models.ValidationError('Название и цвет не должны совпадать.')
+            raise models.ValidationError(
+                'Название и цвет не должны совпадать.'
+            )
+
 
 class Recipe(models.Model):
     author = models.ForeignKey(
@@ -62,51 +54,37 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         verbose_name='автор',
         related_name='recipes',
-        db_index=True
+        db_index=True,
     )
     name = models.SlugField(
-        verbose_name='Название',
-        max_length=255,
-        unique=True,
-        blank=False
+        verbose_name='Название', max_length=255, unique=True, blank=False
     )
     image = models.ImageField(
-        verbose_name='Картинка',
-        upload_to='backend/',
-        blank=True
+        verbose_name='Картинка', upload_to='backend/', blank=True
     )
     description = models.TextField(
-        verbose_name='Текстовое описание',
-        blank=True,
-        null=True
+        verbose_name='Текстовое описание', blank=True, null=True
     )
     ingredients = models.ManyToManyField(
         'Ingredient',
         symmetrical=True,
         related_name='recipe_ingredients',
-        through='IngredientAmount'
+        through='IngredientAmount',
     )
-    tags = models.ManyToManyField(
-        'Tag',
-        through='TagsInRecipe'
-    )
+    tags = models.ManyToManyField('Tag', through='TagsInRecipe')
     cooking_time = models.PositiveIntegerField(
         validators=[
             MinValueValidator(
-                1,
-                'Время приготовления блюда не может быть меньше 1 минуты.'
+                1, 'Время приготовления блюда не может быть меньше 1 минуты.'
             )
         ]
     )
     is_favorited = models.ManyToManyField(
-        User,
-        through='Favorite',
-        related_name='is_favorited'
+        User, through='Favorite', related_name='is_favorited'
     )
     is_in_shopping_cart = models.ManyToManyField(
-        User,
-        through='CartList',
-        related_name='cart_list')
+        User, through='CartList', related_name='cart_list'
+    )
 
     def __str__(self):
         return self.name
@@ -117,30 +95,23 @@ class Recipe(models.Model):
         verbose_name_plural = 'рецепты'
 
 
-
 class IngredientAmount(models.Model):
     recipe = models.ForeignKey(
         'Recipe',
         on_delete=models.CASCADE,
         related_name='ingredients_amount',
         verbose_name='Рецепт',
-        db_index=True
-
+        db_index=True,
     )
     ingredient = models.ForeignKey(
         'Ingredient',
         on_delete=models.PROTECT,
         related_name='ingredient_in_recipes',
         verbose_name='Ингредиент',
-        db_index=True
+        db_index=True,
     )
     amount = models.PositiveIntegerField(
-        validators=[
-            MinValueValidator(
-                1,
-                'Количество не может быть меньше 1'
-            )
-        ]
+        validators=[MinValueValidator(1, 'Количество не может быть меньше 1')]
     )
 
     class Meta:
@@ -149,9 +120,10 @@ class IngredientAmount(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
-                name='unique_ingredient_in_recipe'
+                name='unique_ingredient_in_recipe',
             )
         ]
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(
@@ -159,14 +131,14 @@ class Favorite(models.Model):
         on_delete=models.CASCADE,
         related_name='favorite',
         verbose_name='Пользователь',
-        db_index=True
+        db_index=True,
     )
     recipe = models.ForeignKey(
         'Recipe',
         on_delete=models.CASCADE,
         related_name='favorite',
         verbose_name='Рецепт',
-        db_index=True
+        db_index=True,
     )
 
     def __str__(self):
@@ -176,8 +148,7 @@ class Favorite(models.Model):
         ordering = ['-id']
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='unique_user_recipe_favorite'
+                fields=['user', 'recipe'], name='unique_user_recipe_favorite'
             )
         ]
         verbose_name = 'Избранное'
@@ -186,14 +157,10 @@ class Favorite(models.Model):
 
 class TagsInRecipe(models.Model):
     recipe = models.ForeignKey(
-        'Recipe',
-        on_delete=models.CASCADE,
-        related_name='tags_in_recipe'
+        'Recipe', on_delete=models.CASCADE, related_name='tags_in_recipe'
     )
     tag = models.ForeignKey(
-        'Tag',
-        on_delete=models.CASCADE,
-        related_name='tags_in_recipe'
+        'Tag', on_delete=models.CASCADE, related_name='tags_in_recipe'
     )
 
     class Meta:
@@ -204,6 +171,7 @@ class TagsInRecipe(models.Model):
         ]
         verbose_name = 'Тег в рецепте'
         verbose_name_plural = 'Теги в рецептах'
+
 
 class CartList(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

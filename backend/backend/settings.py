@@ -9,7 +9,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ikla=&&e$=&-*ijw0t+npi&y_+9=sq3@hdo1gvtni_!i_o4c4z'
+SECRET_KEY = (
+    'django-insecure-ikla=&&e$=&-*ijw0t+npi&y_+9=sq3@hdo1gvtni_!i_o4c4z'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,7 +86,6 @@ DATABASES = {
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 
-
 AUTH_USER_MODEL = 'users.User'
 
 # Internationalization
@@ -140,5 +141,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
 
 PDF_FONT_NAME = 'OpenSans'
-PDF_FONT_PATH = 'https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf'
+PDF_FONT_PATH = (
+    'https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf'
+)
 PDF_FONT_SIZE = 14
+PDF_LENTGH = 10
+PDF_CELL_LENTGH = 40
+PDF_CELL_HEIGHT = 10

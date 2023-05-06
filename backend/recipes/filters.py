@@ -12,17 +12,16 @@ class RecipeFilter(FilterSet):
     tags = ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
-        queryset=Tag.objects.all()
+        queryset=Tag.objects.all(),
     )
     author = filters.ModelChoiceFilter(
         queryset=User.objects.all(),
         conjoined=True,
         label=('Автор'),
-        help_text=('Фильтр по автору рецепта')
+        help_text=('Фильтр по автору рецепта'),
     )
     is_favorited = filters.BooleanFilter(method='filter_favorited')
     is_in_shopping_cart = filters.BooleanFilter(method='filter_shopping_cart')
-
 
     def filter_tags(self, queryset, name, value):
         tags = Tag.objects.filter(slug__in=value)
