@@ -4,16 +4,16 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from fpdf import FPDF
+from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
+                            Recipe, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from users.models import Subscription, User
 
 from backend.settings import (PDF_CELL_HEIGHT, PDF_CELL_LENTGH, PDF_FONT_NAME,
                               PDF_FONT_PATH, PDF_FONT_SIZE, PDF_LENTGH)
-from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
-                            Recipe, Tag)
-from users.models import Subscription, User
 
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeWithImageSerializer, SubscriptionSerializer,
