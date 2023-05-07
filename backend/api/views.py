@@ -15,7 +15,6 @@ from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
                             Recipe, Tag)
 from users.models import Subscription, User
 
-from .permissions import AuthorOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeWithImageSerializer, SubscriptionSerializer,
                           TagsSerializer)
@@ -214,7 +213,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             name = ingredient['ingredient__name']
             unit = ingredient['ingredient__measurement_unit']
             amount = ingredient['amount__sum']
-            pdf.cell(PDF_CELL_LENTGH, PDF_CELL_HEIGHT, f'{i + 1}) {name} - {amount} {unit}')
+            pdf.cell(
+                PDF_CELL_LENTGH,
+                PDF_CELL_HEIGHT,
+                f'{i + 1}) {name} - {amount} {unit}'
+            )
             pdf.ln()
         file = pdf.output(dest='S')
         response = HttpResponse(
