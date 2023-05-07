@@ -1,17 +1,13 @@
 version: '3.3'
 services:
 
-  frontend:
-    image: perebevaska/foodgram_frontend:latest
-    volumes:
-      - ./frontend/:/app/result_build/
-
   db:
     image: postgres:13.0-alpine
     volumes:
       - pg:/var/lib/postgresql/data/
     env_file:
       - ./.env
+    restart: always
 
   backend:
     image: perebevaska/foodgram_backend:latest
@@ -23,6 +19,13 @@ services:
       - db
     env_file:
       - ./.env
+
+
+  frontend:
+    image: perebevaska/foodgram_frontend:latest
+    volumes:
+      - ./frontend/:/app/result_build/
+    restart: always
 
   nginx:
     image: nginx:1.19.3
@@ -42,5 +45,6 @@ volumes:
   pg:
   static_value:
   media_value:
+  frontend:
 
 
