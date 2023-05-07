@@ -63,12 +63,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            cd foodgram-project-react/infra/
             sudo docker-compose stop
-            echo y|sudo docker-compose rm foodgram_backend
-            sudo docker rmi perebevaska/foodgram_backend
+            sudo docker-compose rm backend
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
             touch .env
-            echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
             echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
