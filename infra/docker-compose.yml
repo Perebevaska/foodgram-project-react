@@ -4,7 +4,7 @@ services:
   frontend:
     image: perebevaska/foodgram_frontend:latest
     volumes:
-      - ./frontend/:/app/result_build/
+      - ../frontend/:/app/result_build/
 
   db:
     image: postgres:13.0-alpine
@@ -17,8 +17,8 @@ services:
     image: perebevaska/foodgram_backend:latest
     restart: always
     volumes:
-      - static_value:/app_back/static/
-      - media_value:/app_back/media/
+      - static_value:/app_backend/static/
+      - media_value:/app_backend/media/
     depends_on:
       - db
     env_file:
