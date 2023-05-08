@@ -1,5 +1,5 @@
 # praktikum_new_diplom
-![foodgram_workflow](https://github.com/perebevaska/foodgram-project-react/workflows/main/badge.svg)
+![foodgram_workflow](https://github.com/perebevaska/foodgram-project-react/workflows/foodgram/badge.svg)
 
 # сервер
 51.250.90.241
