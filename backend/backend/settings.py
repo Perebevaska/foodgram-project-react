@@ -20,6 +20,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['http://51.250.90.241']
+CORS_ALLOWED_ORIGINS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r'^/api/.*$'
 
 # Application definition
 
@@ -140,8 +143,7 @@ DJOSER = {
     },
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_URLS_REGEX = r'^/api/.*$'
+
 
 PDF_FONT_NAME = 'OpenSans'
 PDF_FONT_PATH = (
