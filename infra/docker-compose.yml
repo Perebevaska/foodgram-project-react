@@ -22,9 +22,11 @@ services:
 
 
   frontend:
-    build: ../frontend
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     volumes:
-      - frontend:/app/result_build/
+      - ../frontend/:/app/result_build/
 
 
   nginx:
@@ -45,6 +47,6 @@ volumes:
   pg:
   static_value:
   media_value:
-  frontend:
+
 
 
