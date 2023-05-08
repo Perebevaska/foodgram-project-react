@@ -24,7 +24,7 @@ services:
   frontend:
     build: ../frontend
     volumes:
-      - frontend:/app/build/
+      - frontend:/app/result_build/
 
 
   nginx:
