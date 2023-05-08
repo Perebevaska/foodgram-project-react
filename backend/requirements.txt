@@ -37,10 +37,12 @@ packaging==23.1
 pathspec==0.11.1
 Pillow==9.5.0
 platformdirs==3.5.0
+psycopg2-binary
 pycodestyle==2.10.0
 pycparser==2.21
 pyflakes==3.0.1
 PyJWT==2.6.0
+python-dotenv==0.19.2
 python3-openid==3.2.0
 pytz==2023.3
 PyYAML==6.0
@@ -52,8 +54,12 @@ social-auth-core==4.4.2
 sqlparse==0.4.4
 tablib==3.4.0
 tomli==2.0.1
+typing_extensions==4.5.0
 uritemplate==4.1.1
 urllib3==1.26.15
 xlrd==2.0.1
 xlwt==1.3.0
-python-dotenv==0.19.2
+
+
+
+
