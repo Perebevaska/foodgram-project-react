@@ -79,7 +79,8 @@ jobs:
           script: |
             sudo docker-compose stop
             sudo docker-compose down
-            sudo docker-compose system prune -a
+            sudo docker-compose rm frontend
+            sudo docker-compose rm backend
             sudo docker pull perebevaska/foodgram_backend:latest
             sudo docker pull perebevaska/foodgram_frontend:latest
             touch .env
