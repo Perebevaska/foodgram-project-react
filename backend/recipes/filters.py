@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django_filters import ModelMultipleChoiceFilter
-from django_filters.rest_framework import FilterSet, filters
+from django_filters.rest_framework import FilterSet
+from rest_framework import filters
 from users.models import User
 
-from .models import Ingredient, Recipe, Tag
+from .models import Recipe, Tag
 
 
 @login_required
@@ -43,9 +44,5 @@ class RecipeFilter(FilterSet):
         fields = ('tags', 'author')
 
 
-class NameFilter(FilterSet):
-    name = filters.CharFilter(lookup_expr='istartswith')
-
-    class Meta:
-        model = Ingredient
-        fields = ('name', )
+class NameFilter(filters.SearchFilter):
+    search_param = 'name'

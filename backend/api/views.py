@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from fpdf import FPDF
-from recipes.filters import NameFilter
+from recipes.filters import NameFilter, RecipeFilter
 from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
                             Recipe, Tag)
 from rest_framework import status, viewsets
@@ -18,7 +18,6 @@ from users.models import Subscription, User
 from backend.settings import (PDF_CELL_HEIGHT, PDF_CELL_LENTGH, PDF_FONT_NAME,
                               PDF_FONT_PATH, PDF_FONT_SIZE, PDF_LENTGH)
 
-from recipes.filters import RecipeFilter
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeWithImageSerializer, SubscriptionSerializer,
                           TagsSerializer)
