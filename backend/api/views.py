@@ -92,8 +92,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     pagination_class = None
-    search_fields = ('^name',)
-    filter_backends = (NameFilter,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = (NameFilter,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -175,13 +175,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 )
             return self.delete_relation(CartList, user, pk, name)
 
-    # def get_ingredients(self, user):
-    #     return IngredientAmount.objects.filter(
-    #         recipe__sh_cart__user=user).values(
-    #             'ingredient__name', 'ingredient__measurement_unit').annotate(
-    #                 Sum('amount', distinct=True))
-
-    # пробую кеширование
     def get_ingredients(self, user):
         cache_key = f'ingredients_user_{user.id}'
         ingredients = cache.get(cache_key)

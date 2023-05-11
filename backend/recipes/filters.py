@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
-from django_filters import ModelMultipleChoiceFilter
-from django_filters.rest_framework import FilterSet
-from rest_framework import filters
+from django_filters import FilterSet, ModelMultipleChoiceFilter, filters
+from rest_framework import filters as fil
 from users.models import User
 
 from .models import Recipe, Tag
@@ -44,5 +43,5 @@ class RecipeFilter(FilterSet):
         fields = ('tags', 'author')
 
 
-class NameFilter(filters.SearchFilter):
+class NameFilter(fil.SearchFilter):
     search_param = 'name'
