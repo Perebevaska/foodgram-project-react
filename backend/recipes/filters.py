@@ -1,14 +1,14 @@
 from django.contrib.auth.decorators import login_required
-from django_filters import FilterSet, ModelMultipleChoiceFilter, filters
-from rest_framework import filters as fil
+from django_filters import rest_framework as filters
+from rest_framework import filters as rest_filters
 from users.models import User
 
 from .models import Recipe, Tag
 
 
 @login_required
-class RecipeFilter(FilterSet):
-    tags = ModelMultipleChoiceFilter(
+class RecipeFilter(filters.FilterSet):
+    tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
         queryset=Tag.objects.all(),
@@ -43,5 +43,5 @@ class RecipeFilter(FilterSet):
         fields = ('tags', 'author')
 
 
-class NameFilter(fil.SearchFilter):
+class IngredientFilter(rest_filters.SearchFilter):
     search_param = 'name'

@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from fpdf import FPDF
-from recipes.filters import NameFilter, RecipeFilter
+from recipes.filters import IngredientFilter, RecipeFilter
 from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
                             Recipe, Tag)
 from rest_framework import status, viewsets
@@ -92,8 +92,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     pagination_class = None
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = (NameFilter,)
+    filter_backends = (DjangoFilterBackend, IngredientFilter)
+    search_fields = ['^name', ]
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
