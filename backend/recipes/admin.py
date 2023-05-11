@@ -14,7 +14,6 @@ class IngredientResource(resources.ModelResource):
         )
 
 
-@admin.register(Ingredient)
 class AdminIngredient(ImportExportModelAdmin):
     resource_classes = [IngredientResource]
     list_display = (
