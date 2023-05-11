@@ -1,20 +1,24 @@
+from api.permissions import AuthorOrReadOnly
 from django.core.cache import cache
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from fpdf import FPDF
+from recipes.filters import NameFilter
 from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
                             Recipe, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import Subscription, User
 
 from backend.settings import (PDF_CELL_HEIGHT, PDF_CELL_LENTGH, PDF_FONT_NAME,
                               PDF_FONT_PATH, PDF_FONT_SIZE, PDF_LENTGH)
 
+from .filters import RecipeFilter
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeWithImageSerializer, SubscriptionSerializer,
                           TagsSerializer)
@@ -82,7 +86,7 @@ class CustomUserViewSet(UserViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagsSerializer
     queryset = Tag.objects.all()
-    permission_classes = (AllowAny,)
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -90,11 +94,15 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     pagination_class = None
     search_fields = ('^name',)
+    filter_backends = (NameFilter,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     queryset = Recipe.objects.all()
+    permission_classes = (AuthorOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = RecipeFilter
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
