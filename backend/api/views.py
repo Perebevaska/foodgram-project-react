@@ -18,7 +18,7 @@ from users.models import Subscription, User
 from backend.settings import (PDF_CELL_HEIGHT, PDF_CELL_LENTGH, PDF_FONT_NAME,
                               PDF_FONT_PATH, PDF_FONT_SIZE, PDF_LENTGH)
 
-from .filters import RecipeFilter
+from recipes.filters import RecipeFilter
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeWithImageSerializer, SubscriptionSerializer,
                           TagsSerializer)
