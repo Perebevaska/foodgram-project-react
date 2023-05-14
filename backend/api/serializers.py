@@ -189,9 +189,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         recipe_obj = obj.author.recipes.all()
         if limit:
             recipe_obj = recipe_obj[:int(limit)]
-        prefetch = Prefetch('recipeingredient_set__ingredient')
-        recipe_obj = recipe_obj.prefetch_related(prefetch)
-        serializer = RecipeWithImageSerializer(recipe_obj, many=True)
+        serializer = ImageRecipeSerializer(recipe_obj, many=True)
         return serializer.data
 
     # def get_recipes(self, obj):

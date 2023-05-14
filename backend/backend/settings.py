@@ -143,10 +143,10 @@ DJOSER = {
     },
 }
 
-PDF_FONT_NAME = 'OpenSans'
-PDF_FONT_PATH = (
-    'https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf'
-)
+# PDF_FONT_NAME = 'OpenSans'
+# PDF_FONT_PATH = (
+#     'https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf'
+# )
 PDF_FONT_SIZE = 14
 PDF_LENTGH = 10
 PDF_CELL_LENTGH = 40

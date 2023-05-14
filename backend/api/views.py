@@ -15,8 +15,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import Subscription, User
 
-from backend.settings import (PDF_CELL_HEIGHT, PDF_CELL_LENTGH, PDF_FONT_NAME,
-                              PDF_FONT_PATH, PDF_FONT_SIZE, PDF_LENTGH)
+from backend.settings import (PDF_CELL_HEIGHT, PDF_CELL_LENTGH, PDF_FONT_SIZE,
+                              PDF_LENTGH)
 
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeWithImageSerializer, SubscriptionSerializer,
@@ -195,16 +195,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_cart(self, request):
         user = request.user
+        if not user.is_authenticated:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         ingredients = IngredientAmount.objects.filter(
             recipe__shopping_cart__user=user
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit'
         ).annotate(Sum('amount', distinct=True))
+        if not ingredients:
+            return Response(
+                {'error': 'Список покупок пуст'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         pdf = FPDF()
         pdf.add_page()
-        pdf.add_font(PDF_FONT_NAME, '', PDF_FONT_PATH, uni=True)
-        pdf.set_font(PDF_FONT_NAME, size=PDF_FONT_SIZE)
+        pdf.add_font('OpenSans', '', './backend/fonts/OpenSans.ttf', uni=True)
+        pdf.set_font('OpenSans', size=PDF_FONT_SIZE)
         pdf.cell(txt='Список покупок', center=True)
         pdf.ln(PDF_LENTGH)
         for i, ingredient in enumerate(ingredients):
