@@ -195,19 +195,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_cart(self, request):
         user = request.user
-        if not user.is_authenticated:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
         ingredients = IngredientAmount.objects.filter(
-            recipe__sh_cart__user=user
+            recipe__shopping_cart__user=user
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit'
         ).annotate(Sum('amount', distinct=True))
-        if not ingredients:
-            return Response(
-                {'error': 'Список покупок пуст'},
-                status=status.HTTP_404_NOT_FOUND,
-            )
         pdf = FPDF()
         pdf.add_page()
         pdf.add_font(PDF_FONT_NAME, '', PDF_FONT_PATH, uni=True)
