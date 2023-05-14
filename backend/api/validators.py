@@ -18,11 +18,10 @@ def validate_tags(tags):
 
 
 def validate_ingredients(data):
-    ingredients = data.get('ingredients')
-    if not ingredients:
+    if not data:
         raise serializers.ValidationError('Обязательное поле "ingredients".')
-    unique_ingredient_ids = set(ingredient['id'] for ingredient in ingredients)
-    if len(unique_ingredient_ids) != len(ingredients):
+    unique_ingredient_ids = set(ingredient['id'] for ingredient in data)
+    if len(unique_ingredient_ids) != len(data):
         raise serializers.ValidationError('Нельзя дублировать ингредиенты.')
     ingredient_ids = Ingredient.objects.filter(
         id__in=unique_ingredient_ids

@@ -118,10 +118,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         user_id = self.context.get('request').user.id
-        return (
-            user_id.is_authenticated
-            and CartList.objects.filter(user=user_id, recipe=obj).exists()
-        )
+        return CartList.objects.filter(user=user_id, recipe=obj).exists()
 
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients', [])
