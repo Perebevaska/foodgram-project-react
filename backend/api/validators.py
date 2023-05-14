@@ -1,31 +1,36 @@
 from recipes.models import Ingredient, Tag
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 
 def validate_tags(tags):
     if not tags:
-        raise serializers.ValidationError('Обязательное поле "tags".')
-    tag_ids = set(tags)
-    if len(tag_ids) != len(tags):
-        raise serializers.ValidationError('Нельзя дублировать теги.')
-    missing_tags = Tag.objects.filter(id__in=tag_ids).values_list(
-        'id', flat=True
-    )
-    if len(missing_tags) < len(tag_ids):
-        invalid_tags = tag_ids - set(missing_tags)
-        raise serializers.ValidationError(f'Теги {invalid_tags} не найдены.')
-    return list(tag_ids)
+        raise ValidationError({'tags': ['Обязательное поле.']})
+    if len(tags) < 1:
+        raise ValidationError({'tags': ['Минимум 1 тег.']})
+    for tag in tags:
+        if not Tag.objects.filter(id=tag).exists():
+            raise ValidationError({'tags': ['Тег отсутствует в базе данных.']})
+    return tags
 
 
-def validate_ingredients(data):
-    if not data:
-        raise serializers.ValidationError('Обязательное поле "ingredients".')
-    unique_ingredient_ids = set(ingredient['id'] for ingredient in data)
-    if len(unique_ingredient_ids) != len(data):
-        raise serializers.ValidationError('Нельзя дублировать ингредиенты.')
-    ingredient_ids = Ingredient.objects.filter(
-        id__in=unique_ingredient_ids
-    ).values_list('id', flat=True)
-    if len(ingredient_ids) != len(unique_ingredient_ids):
-        raise serializers.ValidationError('Некоторые ингредиенты не найдены.')
-    return data
+def validate_ingredients(ingredients):
+    if not ingredients:
+        raise ValidationError({'ingredients': ['Обязательное поле.']})
+    if len(ingredients) < 1:
+        raise ValidationError({'ingredients': ['Не указаны ингредиенты.']})
+    unique_ingredient = []
+    for ingredient in ingredients:
+        if not ingredient.get('id'):
+            raise ValidationError({'ingredients': ['Отсутствует id ингредиента.']})
+        id = ingredient.get('id')
+        if not Ingredient.objects.filter(id=id).exists():
+            raise ValidationError({'ingredients': ['Ингредиента нет в базе данных.']})
+        if id in unique_ingredient:
+            raise ValidationError(
+                {'ingredients': ['Нельзя дублировать имена ингредиентов.']})
+        unique_ingredient.append(id)
+        amount = int(ingredient.get('amount'))
+        if amount < 1:
+            raise ValidationError({'amount': ['Количество не может быть менее 1.']})
+    return ingredients
