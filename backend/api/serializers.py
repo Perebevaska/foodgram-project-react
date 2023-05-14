@@ -125,25 +125,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         return data
 
     def update(self, instance, validated_data):
-        name = validated_data.get('name')
-        image = validated_data.get('image')
-        text = validated_data.get('text')
-        cooking_time = validated_data.get('cooking_time')
-        if name is not None:
-            instance.name = name
-        if image is not None:
-            instance.image = image
-        if text is not None:
-            instance.text = text
-        if cooking_time is not None:
-            instance.cooking_time = cooking_time
+        instance.name = validated_data.get('name', instance.name)
+        instance.image = validated_data.get('image', instance.image)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time)
         instance.save()
         instance.tags.remove()
         self.create_tags(self.initial_data, instance)
         instance.ingredientamount_set.filter(recipe__in=[instance.id]).delete()
         valid_ingredients = validated_data.get(
-            'ingredients', instance.ingredients
-        )
+            'ingredients', instance.ingredients)
         self.create_ingredient_amount(valid_ingredients, instance)
         return instance
 
