@@ -8,7 +8,7 @@ class Ingredient(models.Model):
         verbose_name='Название',
         max_length=255,
     )
-    measurement_unit = models.SlugField(
+    measurement_unit = models.CharField(
         verbose_name='Еденица измерения',
         max_length=255,
     )
