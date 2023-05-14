@@ -55,7 +55,7 @@ class Recipe(models.Model):
         related_name='recipes',
         db_index=True,
     )
-    name = models.CharFieldField(
+    name = models.CharField(
         verbose_name='Название', max_length=255
     )
     image = models.ImageField(
