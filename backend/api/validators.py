@@ -4,7 +4,7 @@ from rest_framework.validators import ValidationError
 
 def validate_tags(tags):
     if not tags:
-        raise ValidationError({'tags': ['Обязательное поле.']})
+        raise ValidationError({'tags': ['Обязательное поле 1111.']})
     if len(tags) < 1:
         raise ValidationError({'tags': ['Минимум 1 тег.']})
     for tag in tags:
@@ -16,7 +16,7 @@ def validate_tags(tags):
 def validate_ingredients(ingredients):
     if not ingredients:
         raise ValidationError(
-            {'ingredients': ['Обязательное поле.']}
+            {'ingredients': ['Обязательное поле 2222.']}
         )
     if len(ingredients) < 1:
         raise ValidationError(
