@@ -118,10 +118,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         return CartList.objects.filter(user=user_id, recipe=obj).exists()
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients', [])
+        ingredients = self.initial_data.get('ingredients')
         valid_ingredients = validate_ingredients(ingredients)
         data['ingredients'] = valid_ingredients
-        data['tags'] = data.get('tags', [])
+        data['tags'] = data.get('tags')
         return data
 
     def update(self, instance, validated_data):

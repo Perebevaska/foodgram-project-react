@@ -55,14 +55,14 @@ class Recipe(models.Model):
         related_name='recipes',
         db_index=True,
     )
-    name = models.SlugField(
-        verbose_name='Название', max_length=255, unique=True, blank=False
+    name = models.CharFieldField(
+        verbose_name='Название', max_length=255
     )
     image = models.ImageField(
         verbose_name='Картинка', upload_to='backend/', blank=True
     )
     description = models.TextField(
-        verbose_name='Текстовое описание', blank=True, null=True
+        verbose_name='Текстовое описание'
     )
     ingredients = models.ManyToManyField(
         'Ingredient',
