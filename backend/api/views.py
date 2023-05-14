@@ -1,5 +1,5 @@
 from api.permissions import AuthorOrReadOnly
-from django.core.cache import cache
+#from django.core.cache import cache
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -175,17 +175,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 )
             return self.delete_relation(CartList, user, pk, name)
 
-    def get_ingredients(self, user):
-        cache_key = f'ingredients_user_{user.id}'
-        ingredients = cache.get(cache_key)
-        if ingredients is None:
-            ingredients = (
-                IngredientAmount.objects.filter(recipe__sh_cart__user=user)
-                .values('ingredient__name', 'ingredient__measurement_unit')
-                .annotate(Sum('amount', distinct=True))
-            )
-            cache.set(cache_key, ingredients)
-        return ingredients
+    # def get_ingredients(self, user):
+    #     cache_key = f'ingredients_user_{user.id}'
+    #     ingredients = cache.get(cache_key)
+    #     if ingredients is None:
+    #         ingredients = (
+    #             IngredientAmount.objects.filter(recipe__sh_cart__user=user)
+    #             .values('ingredient__name', 'ingredient__measurement_unit')
+    #             .annotate(Sum('amount', distinct=True))
+    #         )
+    #         cache.set(cache_key, ingredients)
+    #     return ingredients
 
     @action(
         methods=['get'],
@@ -198,7 +198,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if not user.is_authenticated:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         ingredients = IngredientAmount.objects.filter(
-            recipe__sh_cart__user=user).values(
+            recipe__sh_cart__user=user
+        ).values(
             'ingredient__name',
             'ingredient__measurement_unit'
         ).annotate(Sum('amount', distinct=True))

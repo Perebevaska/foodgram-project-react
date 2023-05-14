@@ -1,4 +1,4 @@
-from django.core.cache import cache
+#from django.core.cache import cache
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
@@ -184,32 +184,30 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             ).exists()
         return False
 
-    # def get_recipes(self, obj):
-    #     limit = self.context.get('request').GET.get('recipes_limit')
-    #     recipe_obj = obj.author.recipes.all()
-    #     if limit:
-    #         recipe_obj = recipe_obj[:int(limit)]
-    #     prefetch = Prefetch('recipeingredient_set__ingredient')
-    #     recipe_obj = recipe_obj.prefetch_related(prefetch)
-    #     serializer = RecipeWithImageSerializer(recipe_obj, many=True)
-    #     return serializer.data
-
-    # пробую кеширование
-
     def get_recipes(self, obj):
         limit = self.context.get('request').GET.get('recipes_limit')
-        cache_key = f"recipes_{obj.author.id}_{limit}"
-        data = cache.get(cache_key)
-        if data is None:
-            prefetch = Prefetch('recipeingredient_set__ingredient')
-            recipes = obj.author.recipes.all().prefetch_related(prefetch)
-            if limit:
-                limit = self.validate_integer(limit)
-                recipes = recipes[:limit]
-            serializer = RecipeWithImageSerializer(recipes, many=True)
-            data = serializer.data
-            cache.set(cache_key, data)
-        return data
+        recipe_obj = obj.author.recipes.all()
+        if limit:
+            recipe_obj = recipe_obj[:int(limit)]
+        prefetch = Prefetch('recipeingredient_set__ingredient')
+        recipe_obj = recipe_obj.prefetch_related(prefetch)
+        serializer = RecipeWithImageSerializer(recipe_obj, many=True)
+        return serializer.data
+
+    # def get_recipes(self, obj):
+    #     limit = self.context.get('request').GET.get('recipes_limit')
+    #     cache_key = f"recipes_{obj.author.id}_{limit}"
+    #     data = cache.get(cache_key)
+    #     if data is None:
+    #         prefetch = Prefetch('recipeingredient_set__ingredient')
+    #         recipes = obj.author.recipes.all().prefetch_related(prefetch)
+    #         if limit:
+    #             limit = self.validate_integer(limit)
+    #             recipes = recipes[:limit]
+    #         serializer = RecipeWithImageSerializer(recipes, many=True)
+    #         data = serializer.data
+    #         cache.set(cache_key, data)
+    #     return data
 
     def validate_integer(self, value):
         try:
