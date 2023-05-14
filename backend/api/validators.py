@@ -2,7 +2,7 @@ from recipes.models import Ingredient, Tag
 from rest_framework import serializers
 
 
-def validate_tags(self, tags):
+def validate_tags(tags):
     if not tags:
         raise serializers.ValidationError('Обязательное поле "tags".')
     tag_ids = set(tags)
@@ -17,7 +17,7 @@ def validate_tags(self, tags):
     return list(tag_ids)
 
 
-def validate_ingredients(self, data):
+def validate_ingredients(data):
     ingredients = data.get('ingredients')
     if not ingredients:
         raise serializers.ValidationError('Обязательное поле "ingredients".')
