@@ -197,7 +197,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         if not user.is_authenticated:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        ingredients = self.get_ingredients(user)
+        ingredients = IngredientAmount.objects.filter(
+            recipe__sh_cart__user=user).values(
+            'ingredient__name',
+            'ingredient__measurement_unit'
+        ).annotate(Sum('amount', distinct=True))
         if not ingredients:
             return Response(
                 {'error': 'Список покупок пуст'},
