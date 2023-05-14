@@ -59,14 +59,13 @@ class Recipe(models.Model):
         verbose_name='Название', max_length=255
     )
     image = models.ImageField(
-        verbose_name='Картинка', upload_to='backend/', blank=True
+        verbose_name='Картинка', upload_to='backend/'
     )
     description = models.TextField(
         verbose_name='Текстовое описание'
     )
     ingredients = models.ManyToManyField(
         'Ingredient',
-        symmetrical=True,
         related_name='recipe_ingredients',
         through='IngredientAmount',
     )
