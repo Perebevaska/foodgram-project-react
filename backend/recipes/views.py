@@ -7,7 +7,8 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from recipes.filters import CustomSearchFilter, RecipeFilter
+from recipes.filters import RecipeFilter
+from recipes.ingr_filters import CustomSearchFilter
 from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
                             ShoppingCart, Tag)
 from recipes.permissions import AuthorOrReadOnly
