@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-# from recipes.models import Recipe
+from recipes.serializers import SmallRecipeSerializer
 from users.models import Subscription, User
 
 
@@ -25,21 +24,16 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Создание нового пользователя."""
-        user = User.objects.create(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-        )
+        user = User.objects.create(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
         return user
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    email = serializers.ReadOnlyField(source='author.email')
     id = serializers.ReadOnlyField(source='author.id')
     username = serializers.ReadOnlyField(source='author.username')
+    email = serializers.ReadOnlyField(source='author.email')
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
     recipes = serializers.SerializerMethodField()
@@ -61,7 +55,6 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     def get_recipes(self, obj):
         """Получение списка рецептов автора."""
-        from recipes.serializers import SmallRecipeSerializer
         limit = self.context.get('request').GET.get('recipes_limit')
         recipe_obj = obj.author.recipes.all()
         if limit:
