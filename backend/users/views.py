@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -13,10 +14,14 @@ from .models import Subscription, User
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
 
-    @action(detail=False, url_path='subscriptions',
-            url_name='subscriptions', permission_classes=[IsAuthenticated])
+    @action(
+        detail=False,
+        url_path='subscriptions',
+        url_name='subscriptions',
+        permission_classes=[IsAuthenticated]
+    )
     def subscriptions(self, request):
-        """Список авторов, на которых подписан пользователь."""
+        """Список пользователей, на которых подписан пользователь."""
         user = request.user
         queryset = user.follower.all()
         pages = self.paginate_queryset(queryset)
@@ -24,32 +29,43 @@ class CustomUserViewSet(UserViewSet):
             pages, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
 
-    @action(methods=['post', 'delete'], detail=True, url_path='subscribe',
-            url_name='subscribe', permission_classes=[IsAuthenticated])
+    @action(
+        methods=['post', 'delete'],
+        detail=True,
+        url_path='subscribe',
+        url_name='subscribe',
+        permission_classes=[IsAuthenticated]
+    )
     def subscribe(self, request, id=None):
-        """Подписка на автора."""
+        """Подписка на автора рецепта."""
         user = request.user
         author = get_object_or_404(User, id=id)
         if user == author:
-            return Response(
-                {'errors': 'На себя нельзя подписаться / отписаться'},
-                status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError('На себя нельзя подписаться / отписаться')
         subscription = Subscription.objects.filter(
             author=author, user=user)
         if request.method == 'POST':
-            if subscription.exists():
-                return Response(
-                    {'errors': 'Нельзя подписаться повторно'},
-                    status=status.HTTP_400_BAD_REQUEST)
-            queryset = Subscription.objects.create(author=author, user=user)
+            subscription, created = Subscription.objects.get_or_create(
+                author=author,
+                user=user
+            )
+            if not created:
+                raise ValidationError('Нельзя подписаться повторно')
             serializer = SubscriptionSerializer(
-                queryset, context={'request': request})
+                subscription,
+                context={'request': request}
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if request.method == 'DELETE':
-            if not subscription.exists():
-                return Response(
-                    {'errors': 'Нельзя отписаться повторно'},
-                    status=status.HTTP_400_BAD_REQUEST)
+        elif request.method == 'DELETE':
+            subscription = Subscription.objects.filter(
+                author=author,
+                user=user
+            ).first()
+            if not subscription:
+                raise ValidationError(
+                    'Нельзя отписаться от неподписанного автора'
+                )
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        else:
+            raise ValidationError('Метод не поддерживается')
