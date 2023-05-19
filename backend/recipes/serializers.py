@@ -120,9 +120,18 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Создание рецепта"""
         valid_ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(**validated_data)
-        self.create_tags(self.initial_data, recipe)
-        self.create_ingredient_amount(valid_ingredients, recipe)
+        tags_data = self.initial_data.get('tags', [])
+        with transaction.atomic():
+            recipe = Recipe.objects.create(**validated_data)
+            self.create_tags({'tags': tags_data}, recipe)
+            ingredient_ids = [ingredient_data.get('id') for ingredient_data in valid_ingredients]
+            ingredients = Ingredient.objects.filter(id__in=ingredient_ids)
+            ingredient_amounts = [
+                IngredientAmount(recipe=recipe, ingredient=ingredients.get(id=ingredient_data.get('id')),
+                                 amount=ingredient_data.get('amount'))
+                for ingredient_data in valid_ingredients
+            ]
+            IngredientAmount.objects.bulk_create(ingredient_amounts)
         return recipe
 
     def validate(self, data):
