@@ -113,7 +113,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create_tags(self, data, recipe):
         """Отправка на валидацию и создание тэгов у рецепта."""
         valid_tags = validate_tags(data.get('tags'))
-        tags = Tag.objects.filter(id__in=valid_tags)
+        tags = Tag.objects.get_queryset().filter(id__in=valid_tags)
         recipe.tags.set(tags)
 
     @transaction.atomic
