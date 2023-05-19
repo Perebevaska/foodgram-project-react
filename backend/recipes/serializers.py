@@ -125,7 +125,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             recipe = Recipe.objects.create(**validated_data)
             self.create_tags({'tags': tags_data}, recipe)
             ingredient_ids = [
-                ingredient_data.get('id') for ingredient_data in valid_ingredients
+                ingredient_data.get(
+                    'id') for ingredient_data in valid_ingredients
             ]
             ingredients = Ingredient.objects.filter(id__in=ingredient_ids)
             ingredient_amounts = [
