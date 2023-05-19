@@ -9,14 +9,14 @@ from .models import Subscription, User
 
 
 class CustomUserAdmin(UserAdmin):
-    """Кастомная админка для модели User."""
+    """Админка для модели User."""
     search_fields = ('email', 'username')
     list_filter = ('email', 'username')
     ordering = ('pk',)
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    """Кастомная админка для модели Ingredient."""
+    """Админка для модели Ingredient."""
     list_display = (
         'pk',
         'name',
@@ -28,7 +28,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    """Кастомная админка для модели Tag."""
+    """Аадминка для модели Tag."""
     list_display = (
         'pk',
         'name',
@@ -45,7 +45,7 @@ class IngredientAmountInline(admin.TabularInline):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    """Кастомная админка для модели Recipe."""
+    """Аадминка  для модели Recipe."""
     list_display = (
         'pk',
         'name',
@@ -94,9 +94,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
 admin.site.unregister(Group)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Subscription, SubscriptionAdmin)
+admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Favorite, FavoriteShoppingAdmin)
-admin.site.register(ShoppingCart, FavoriteShoppingAdmin)
 admin.site.register(IngredientAmount, IngredientAmountAdmin)
+admin.site.register(ShoppingCart, FavoriteShoppingAdmin)
