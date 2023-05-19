@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
@@ -6,6 +6,7 @@ from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
                             ShoppingCart, Tag)
 from recipes.validators import validate_ingredients, validate_tags
 from users.serializers import CustomUserSerializer
+from django.db import transaction
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -93,13 +94,19 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create_ingredient_amount(self, valid_ingredients, recipe):
         """Создает записи в модели IngredientAmount
         для указанного количества ингредиентов."""
-        ingredient_ids = [ingredient_data.get('id') for ingredient_data in valid_ingredients]
+        ingredient_ids = [
+            ingredient_data.get('id') for ingredient_data in valid_ingredients
+        ]
         ingredients = Ingredient.objects.filter(id__in=ingredient_ids)
         ingredient_amounts = []
         for ingredient_data in valid_ingredients:
             ingredient = ingredients.get(id=ingredient_data.get('id'))
             ingredient_amounts.append(
-                IngredientAmount(recipe=recipe, ingredient=ingredient, amount=ingredient_data.get('amount'))
+                IngredientAmount(
+                    recipe=recipe,
+                    ingredient=ingredient,
+                    amount=ingredient_data.get('amount')
+                )
             )
         IngredientAmount.objects.bulk_create(ingredient_amounts)
 
@@ -109,6 +116,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags = Tag.objects.filter(id__in=valid_tags)
         recipe.tags.set(tags)
 
+    @transaction.atomic
     def create(self, validated_data):
         """Создание рецепта"""
         valid_ingredients = validated_data.pop('ingredients')
@@ -124,6 +132,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         data['ingredients'] = valid_ingredients
         return data
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         """Изменение рецепта"""
         instance.name = validated_data.get('name', instance.name)
