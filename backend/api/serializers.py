@@ -67,15 +67,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ImageRecipeSerializer(serializers.ModelSerializer):
-    image = Base64ImageField()
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-        read_only_fields = ('id', 'name', 'image', 'cooking_time')
-
-
 class RecipeSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = TagsSerializer(read_only=True, many=True)
@@ -189,7 +180,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         recipe_obj = obj.author.recipes.all()
         if limit:
             recipe_obj = recipe_obj[:int(limit)]
-        serializer = ImageRecipeSerializer(recipe_obj, many=True)
+        serializer = RecipeWithImageSerializer(recipe_obj, many=True)
         return serializer.data
 
     # def get_recipes(self, obj):
