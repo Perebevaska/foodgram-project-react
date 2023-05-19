@@ -1,6 +1,6 @@
 from rest_framework.validators import ValidationError
 
-from recipes.models import Ingredient, Tag
+from recipes.models import Tag
 
 
 def validate_tags(data):
@@ -13,6 +13,7 @@ def validate_tags(data):
         if not Tag.objects.filter(id=tag).exists():
             raise ValidationError({'tags': ['Тэг отсутствует']})
     return data
+
 
 def validate_ingredients(data):
     """Валидация ингредиентов."""
