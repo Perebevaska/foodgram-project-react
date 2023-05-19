@@ -1,3 +1,5 @@
+# from django.core.cache import cache
+# from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from recipes.models import (CartList, Favorite, Ingredient, IngredientAmount,
@@ -85,7 +87,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
 
     def create(self, validated_data):
-        validated_data['author'] = self.context['request'].user
         valid_ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         self.create_tags(self.initial_data, recipe)

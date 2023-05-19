@@ -210,8 +210,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         pdf = FPDF()
         pdf.add_page()
-        pdf.add_font('Shentox', '', './backend/fonts/Shentox.ttf', uni=True)
-        pdf.set_font('Shentox', size=PDF_FONT_SIZE)
+        pdf.add_font('OpenSans', '', './backend/fonts/OpenSans.ttf', uni=True)
+        pdf.set_font('OpenSans', size=PDF_FONT_SIZE)
         pdf.cell(txt='Список покупок', center=True)
         pdf.ln(PDF_LENTGH)
         for i, ingredient in enumerate(ingredients):
