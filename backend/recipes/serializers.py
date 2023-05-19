@@ -92,10 +92,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Создание рецепта"""
-        valid_ingredients = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        ingredients_data = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
-        self.create_tags(self.initial_data, recipe)
-        self.create_ingredient_amount(valid_ingredients, recipe)
+        self.create_tags(tags_data, recipe)
+        self.create_ingredient_amount(ingredients_data, recipe)
         return recipe
 
     def validate(self, data):
@@ -107,17 +108,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Изменение рецепта"""
-        instance.name = validated_data.get('name', instance.name)
-        instance.image = validated_data.get('image', instance.image)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
-        instance.save()
-        instance.tags.set(validated_data.get('tags', instance.tags.all()))
-        # Удаление старых ингредиентов и добавление новых
-        IngredientAmount.objects.filter(recipe=instance).delete()
-        ingredients_data = validated_data.get('ingredients', [])
-        instance.create_ingredient_amounts(ingredients_data)
-
+        tags_data = validated_data.pop('tags')
+        ingredients_data = validated_data.pop('ingredients')
+        instance.tags.clear()
+        instance.ingredientamount_set.filter(recipe=instance).delete()
+        instance.update(**validated_data)
+        self.create_tags(tags_data, instance)
+        self.create_ingredient_amount(ingredients_data, instance)
         return instance
