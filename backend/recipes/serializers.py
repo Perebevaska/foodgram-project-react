@@ -93,13 +93,15 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create_ingredient_amount(self, valid_ingredients, recipe):
         """Создает записи в модели IngredientAmount
         для указанного количества ингредиентов."""
+        ingredient_ids = [ingredient_data.get('id') for ingredient_data in valid_ingredients]
+        ingredients = Ingredient.objects.filter(id__in=ingredient_ids)
+        ingredient_amounts = []
         for ingredient_data in valid_ingredients:
-            ingredient = get_object_or_404(
-                Ingredient, id=ingredient_data.get('id'))
-            IngredientAmount.objects.create(
-                recipe=recipe,
-                ingredient=ingredient,
-                amount=ingredient_data.get('amount'))
+            ingredient = ingredients.get(id=ingredient_data.get('id'))
+            ingredient_amounts.append(
+                IngredientAmount(recipe=recipe, ingredient=ingredient, amount=ingredient_data.get('amount'))
+            )
+        IngredientAmount.objects.bulk_create(ingredient_amounts)
 
     def create_tags(self, data, recipe):
         """Отправка на валидацию и создание тэгов у рецепта."""
