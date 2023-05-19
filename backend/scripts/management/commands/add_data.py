@@ -44,5 +44,7 @@ class Command(BaseCommand):
                         (name, unit)
                     )
             self.stdout.write(
-                self.style.SUCCESS(f'Записи успешно добавлены в таблицу {table}')
+                self.style.SUCCESS(
+                    f'Записи успешно добавлены в таблицу {table}'
+                )
             )
