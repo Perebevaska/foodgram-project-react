@@ -83,7 +83,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         return False
 
     def create_ingredient_amount(self, valid_ingredients, recipe):
-        """Запись количества ингридиентов"""
+        """Создает записи в модели IngredientAmount
+        для указанного количества ингредиентов."""
+        if not recipe:
+            return
+        if not valid_ingredients:
+            return
         for ingredient_data in valid_ingredients:
             ingredient = get_object_or_404(
                 Ingredient, id=ingredient_data.get('id'))
