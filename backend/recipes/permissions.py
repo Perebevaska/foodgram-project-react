@@ -1,24 +1,20 @@
 from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied
 
 
-class AdminOrReadOnly(permissions.BasePermission):
-    """
-    Разрешает доступ для аутентифицированных
-    пользователей с правами администратора
-    для всех методов, кроме POST, PUT и DELETE.
-    """
-
+class AuthorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        """
-        Проверяет, имеет ли пользователь права администратора
-        или запрашивается безопасный метод.
-        """
-        return (request.method in permissions.SAFE_METHODS
-                or request.user.is_superuser)
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if not request.user.is_authenticated:
+            raise PermissionDenied(detail='Нет доступа без авторизации.')
+        return True
 
     def has_object_permission(self, request, view, obj):
-        """
-        Проверяет, имеет ли пользователь права администратора
-        или запрашивается безопасный метод.
-        """
-        return self.has_permission(request, view)
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if not request.user.is_authenticated:
+            raise PermissionDenied(detail='Нет доступа без авторизации.')
+        if request.user.is_staff or request.user == obj.author:
+            return True
+        raise PermissionDenied(detail='У вас нет прав для этого действия.')

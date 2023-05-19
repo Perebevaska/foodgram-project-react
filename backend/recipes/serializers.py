@@ -63,19 +63,19 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
 
     def get_is_favorited(self, obj):
-        """Статус - рецепт в избранном или нет."""
+        """Рецепт в избранном"""
         user_id = self.context.get('request').user.id
         return Favorite.objects.filter(
             user=user_id, recipe=obj.id).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        """Статус - рецепт в избранном или нет."""
+        """Рецепт в корзине покупок"""
         user_id = self.context.get('request').user.id
         return ShoppingCart.objects.filter(
             user=user_id, recipe=obj.id).exists()
 
     def create_ingredient_amount(self, valid_ingredients, recipe):
-        """Создание уникальных записей: ингредиент - рецепт - количество."""
+        """Запись количества ингридиентов"""
         for ingredient_data in valid_ingredients:
             ingredient = get_object_or_404(
                 Ingredient, id=ingredient_data.get('id'))
@@ -91,7 +91,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags)
 
     def create(self, validated_data):
-        """Создание рецепта - writable nested serializers."""
+        """Создание рецепта"""
         valid_ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         self.create_tags(self.initial_data, recipe)
@@ -105,7 +105,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return data
 
     def update(self, instance, validated_data):
-        """Изменение рецепта - writable nested serializers."""
+        """Изменение рецепта"""
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
