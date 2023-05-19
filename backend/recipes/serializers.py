@@ -58,8 +58,16 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'tags', 'author', 'ingredients', 'is_favorited',
-            'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time'
+            'id',
+            'name',
+            'image',
+            'text',
+            'tags',
+            'author',
+            'ingredients',
+            'is_favorited',
+            'is_in_shopping_cart',
+            'cooking_time'
         )
 
     def get_is_favorited(self, obj):
@@ -85,10 +93,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create_ingredient_amount(self, valid_ingredients, recipe):
         """Создает записи в модели IngredientAmount
         для указанного количества ингредиентов."""
-        if not recipe:
-            return
-        if not valid_ingredients:
-            return
         for ingredient_data in valid_ingredients:
             ingredient = get_object_or_404(
                 Ingredient, id=ingredient_data.get('id'))
