@@ -1,7 +1,19 @@
+from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.serializers import SmallRecipeSerializer as SmallSerializer
+from recipes.models import Recipe
 from users.models import Subscription, User
+
+
+# данный сериализатор не импортируется из
+# приложения recipe. пришлось хардкорить
+class SmallRecipeSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+        read_only_fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -68,9 +80,10 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     def get_recipes(self, obj):
         """Получение рецептов пользователя."""
+
         limit = self.context.get('request').GET.get('recipes_limit')
         recipe_obj = obj.author.recipes.all()
         if limit:
             recipe_obj = recipe_obj[:int(limit)]
-        serializer = SmallSerializer(recipe_obj, many=True)
+        serializer = SmallRecipeSerializer(recipe_obj, many=True)
         return serializer.data
