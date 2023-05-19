@@ -6,6 +6,10 @@ from tags_ingr.models import Tag
 from users.models import User
 
 
+class CustomSearchFilter(filters.SearchFilter):
+    search_param = 'name'
+
+
 class RecipeFilter(FilterSet):
     tags = ModelMultipleChoiceFilter(
         field_name='tags__slug',

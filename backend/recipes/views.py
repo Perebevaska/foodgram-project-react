@@ -7,10 +7,26 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from recipes.filters import RecipeFilter
-from recipes.models import Favorite, IngredientAmount, Recipe, ShoppingCart
+from recipes.filters import CustomSearchFilter, RecipeFilter
+from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                            ShoppingCart, Tag)
 from recipes.permissions import AuthorOrReadOnly
-from recipes.serializers import RecipeSerializer, SmallRecipeSerializer
+from recipes.serializers import (IngredientSerializer, RecipeSerializer,
+                                 SmallRecipeSerializer, TagSerializer)
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    pagination_class = None
+
+
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    pagination_class = None
+    filter_backends = [CustomSearchFilter]
+    search_fields = ('^name',)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

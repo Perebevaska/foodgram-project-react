@@ -3,7 +3,8 @@ from rest_framework import permissions
 
 class AdminOrReadOnly(permissions.BasePermission):
     """
-    Разрешает доступ для аутентифицированных пользователей с правами администратора
+    Разрешает доступ для аутентифицированных
+    пользователей с правами администратора
     для всех методов, кроме POST, PUT и DELETE.
     """
 

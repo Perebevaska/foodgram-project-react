@@ -1,12 +1,27 @@
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
+from recipe.models import Ingredient, Tag
 from rest_framework import serializers
 
 from recipes.models import Favorite, IngredientAmount, Recipe, ShoppingCart
 from recipes.validators import validate_ingredients, validate_tags
-from tags_ingr.models import Ingredient, Tag
-from tags_ingr.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = (
+            'id', 'name', 'color', 'slug'
+        )
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = (
+            'id', 'name', 'measurement_unit'
+        )
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
