@@ -99,6 +99,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def validate(self, data):
+        """Валидация данных."""
         ingredients = self.initial_data.get('ingredients')
         valid_ingredients = validate_ingredients(ingredients)
         data['ingredients'] = valid_ingredients
@@ -123,8 +124,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.cooking_time
         )
         instance.save()
-        tags_data = validated_data.pop('tags', [])
-        instance.tags.set(tags_data)
+        instance.tags.remove()
+        self.create_tags(self.initial_data, instance)
         IngredientAmount.objects.filter(recipe=instance).delete()
         ingredients_data = validated_data.pop('ingredients', [])
         for ingredient_data in ingredients_data:
