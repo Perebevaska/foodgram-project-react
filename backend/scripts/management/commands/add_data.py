@@ -39,7 +39,10 @@ class Command(BaseCommand):
                 for row in reader:
                     name, unit = row
                     cur.execute(
-                        f'INSERT INTO {table} (name, measurement_unit) VALUES (%s, %s)',
+                        f'INSERT INTO {table} ('
+                        f'name, measurement_unit) VALUES (%s, %s)',
                         (name, unit)
                     )
-            self.stdout.write(self.style.SUCCESS(f'Записи успешно добавлены в таблицу {table}'))
+            self.stdout.write(
+                self.style.SUCCESS(f'Записи успешно добавлены в таблицу {table}')
+            )

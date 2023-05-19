@@ -2,6 +2,7 @@ from rest_framework.validators import ValidationError
 
 from recipes.models import Ingredient, Tag
 
+
 def validate_tags(data):
     """Валидация тэгов."""
     if not data:
@@ -28,5 +29,7 @@ def validate_ingredients(data):
         unique_ingredient.append(id)
         amount = int(ingredient.get('amount'))
         if amount < 1:
-            raise ValidationError({'amount': ['Количество не может быть меньше 1.']})
+            raise ValidationError({'amount': [
+                'Количество не может быть меньше 1.'
+            ]})
     return data
