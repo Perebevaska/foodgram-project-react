@@ -63,7 +63,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
 
     def get_is_favorited(self, obj):
-        """Проверяет, является ли рецепт избранным для пользователя, который отправил запрос."""
+        """Проверяет, является ли рецепт избранным
+        для пользователя, который отправил запрос."""
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             user_id = request.user.id
@@ -72,7 +73,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         return False
 
     def get_is_in_shopping_cart(self, obj):
-        """Рецепт в корзине покупок"""
+        """Проверяет, есть ли рецепт в корзине
+        покупок пользователя, который отправил запрос."""
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             user_id = request.user.id
