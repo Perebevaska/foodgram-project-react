@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from recipes.serializers import SmallRecipeSerializer
+from recipes.serializers import SmallRecipeSerializer as SmallSerializer
 from users.models import Subscription, User
 
 
@@ -72,5 +72,5 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         recipe_obj = obj.author.recipes.all()
         if limit:
             recipe_obj = recipe_obj[:int(limit)]
-        serializer = SmallRecipeSerializer(recipe_obj, many=True)
+        serializer = SmallSerializer(recipe_obj, many=True)
         return serializer.data
