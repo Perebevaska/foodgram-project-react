@@ -21,9 +21,10 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'api',
+    'recipes',
     'users',
     'tags_ingr',
-    'recipes',
+
     'scripts',
     'dotenv',
 ]
