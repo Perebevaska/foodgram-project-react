@@ -4,23 +4,29 @@ from users.models import Subscription, User
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
-
+    """Сериализатор пользователя"""
     password = serializers.CharField(write_only=True)
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username', 'first_name',
-            'last_name', 'password', 'is_subscribed'
+            'id',
+            'username',
+            'email',
+            'first_name',
+            'last_name', 'password',
+            'is_subscribed'
         )
         write_only_fields = ('password',)
 
     def get_is_subscribed(self, obj):
-        """Статус подписки на автора."""
+        """Статус подписки на пользователя."""
         user_id = self.context.get('request').user.id
         return Subscription.objects.filter(
-            author=obj.id, user=user_id).exists()
+            author=obj.id,
+            user=user_id
+        ).exists()
 
     def create(self, validated_data):
         """Создание нового пользователя."""
@@ -43,18 +49,24 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = (
-            'email', 'id', 'username', 'first_name', 'last_name',
-            'is_subscribed', 'recipes', 'recipes_count'
+            'id',
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'recipes',
+            'recipes_count',
+            'is_subscribed',
         )
 
     def get_is_subscribed(self, obj):
-        """Статус подписки на автора."""
+        """Статус подписки на пользователя."""
         user = self.context.get('request').user
         return Subscription.objects.filter(
             author=obj.author, user=user).exists()
 
     def get_recipes(self, obj):
-        """Получение списка рецептов автора."""
+        """Получение рецептов пользователя."""
         limit = self.context.get('request').GET.get('recipes_limit')
         recipe_obj = obj.author.recipes.all()
         if limit:
