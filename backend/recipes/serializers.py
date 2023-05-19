@@ -110,7 +110,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time)
         tags = validated_data.get('tags')
         if tags is not None:
             instance.tags.set(tags)
@@ -119,8 +120,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredient_amounts = []
             for ingredient in ingredients:
                 amount = ingredient.pop('amount')
-                ingredient_obj = Ingredient.objects.get(name=ingredient['name'])
-                ingredient_amounts.append(IngredientAmount(recipe=instance, ingredient=ingredient_obj, amount=amount))
+                ingredient_obj = Ingredient.objects.get(
+                    name=ingredient['name'])
+                ingredient_amounts.append(IngredientAmount(
+                    recipe=instance, ingredient=ingredient_obj, amount=amount))
             instance.ingredientamount_set.filter(recipe=instance).delete()
             IngredientAmount.objects.bulk_create(ingredient_amounts)
         instance.save()
