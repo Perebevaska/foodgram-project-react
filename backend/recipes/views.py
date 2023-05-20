@@ -63,18 +63,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
         relation.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['post', 'delete'], detail=True, url_path='favorite',
-            url_name='favorite')
+    @action(
+        methods=['post', 'delete'],
+        detail=True,
+        url_path='favorite',
+        url_name='favorite'
+    )
     def favorite(self, request, pk=None):
-        """Добавление и удаление рецептов - Избранное."""
         user = request.user
         if request.method == 'POST':
-            name = 'избранное'
-            return self.add(Favorite, user, pk, name)
-        if request.method == 'DELETE':
-            name = 'избранного'
-            return self.delete_relation(Favorite, user, pk, name)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            return self._add_to_favorite(user, pk)
+        elif request.method == 'DELETE':
+            return self._delete_from_favorite(user, pk)
+        else:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def _add_to_favorite(self, user, pk):
+        name = 'избранное'
+        return self.add(Favorite, user, pk, name)
+
+    def _delete_from_favorite(self, user, pk):
+        name = 'избранного'
+        return self.delete_relation(Favorite, user, pk, name)
 
     @action(
         methods=['post', 'delete'],
@@ -99,8 +109,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         name = 'списка покупок'
         return self.delete_relation(ShoppingCart, user, pk, name)
 
-    @action(methods=['get'], detail=False, url_path='download_shopping_cart',
-            url_name='download_shopping_cart')
+    @action(
+        methods=['get'],
+        detail=False,
+        url_path='download_shopping_cart',
+        url_name='download_shopping_cart'
+    )
     def download_cart(self, request):
         """Формирование и скачивание списка покупок."""
         user = request.user
