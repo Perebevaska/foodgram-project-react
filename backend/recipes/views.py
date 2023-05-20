@@ -43,8 +43,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def add(self, model, user, pk, name):
         """Добавление рецепта в список пользователя."""
         recipe = get_object_or_404(Recipe, pk=pk)
-        relation = model.objects.filter(user=user, recipe=recipe)
-        if relation.exists():
+        if model.objects.filter(user=user, recipe=recipe).exists():
             return Response(
                 {'errors': f'Нельзя повторно добавить рецепт в {name}'},
                 status=status.HTTP_400_BAD_REQUEST)
@@ -55,12 +54,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def delete_relation(self, model, user, pk, name):
         """"Удаление рецепта из списка пользователя."""
         recipe = get_object_or_404(Recipe, pk=pk)
-        relation = model.objects.filter(user=user, recipe=recipe)
-        if not relation.exists():
+        if not model.objects.filter(user=user, recipe=recipe).exists():
             return Response(
                 {'errors': f'Нельзя повторно удалить рецепт из {name}'},
                 status=status.HTTP_400_BAD_REQUEST)
-        relation.delete()
+        model.objects.filter(user=user, recipe=recipe).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
