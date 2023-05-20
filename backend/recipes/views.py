@@ -1,6 +1,12 @@
+import os
+
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db.models import Sum
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
+from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from fpdf import FPDF
 from rest_framework import status, viewsets
@@ -94,27 +100,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_cart(self, request):
         """Формирование и скачивание списка покупок."""
         user = request.user
-        ingredients = IngredientAmount.objects.filter(
-            recipe__sh_cart__user=user).values(
-                'ingredient__name', 'ingredient__measurement_unit').annotate(
-                    Sum('amount', distinct=True))
+        ingredients = get_list_or_404(
+            IngredientAmount.objects.filter(recipe__sh_cart__user=user)
+            .values('ingredient__name', 'ingredient__measurement_unit')
+            .annotate(total_amount=Sum('amount')))
         pdf = FPDF()
         pdf.add_page()
         pdf.add_font(
-            'DejaVu', '', './recipes/fonts/DejaVuSansCondensed.ttf', uni=True)
-        pdf.set_font('DejaVu', size=14)
-        pdf.cell(txt='Список покупок', center=True)
+            'Shentox', '', os.path.join(
+                settings.BASE_DIR,
+                'fonts/Shentox.ttf'
+            ), uni=True)
+        pdf.set_font('Shentox', size=12)
+        pdf.cell(txt=_('Shopping List'), center=True)
         pdf.ln(8)
         for i, ingredient in enumerate(ingredients):
             name = ingredient['ingredient__name']
             unit = ingredient['ingredient__measurement_unit']
-            amount = ingredient['amount__sum']
-            pdf.cell(40, 10, f'{i + 1}) {name} - {amount} {unit}')
+            amount = ingredient['total_amount']
+            pdf.cell(30, 15, f'{i + 1}) {name} - {amount} {unit}')
             pdf.ln()
         file = pdf.output(dest='S')
-        response = HttpResponse(
-            content_type='application/pdf', status=status.HTTP_200_OK)
-        response['Content-Disposition'] = (
-            'attachment; filename="shopping_cart.pdf"')
-        response.write(bytes(file))
-        return response
+        filename = 'shopping_cart.pdf'
+        path = default_storage.save(filename, ContentFile(bytes(file)))
+        if not path:
+            raise ImproperlyConfigured(_('Could not save file %s') % filename)
+        url = default_storage.url(path)
+        return Response({'url': url}, status=status.HTTP_200_OK)

@@ -1,5 +1,6 @@
-import os
 import csv
+import os
+
 import psycopg2
 from django.core.management.base import BaseCommand, CommandError
 
@@ -16,16 +17,10 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         path = kwargs['path']
         table = kwargs['tab_name']
-
-        # Валидация пути к файлу
         if not os.path.isfile(path):
             raise CommandError(f'Файл "{path}" не найден')
-
-        # Валидация имени таблицы
         if not table.isidentifier():
             raise CommandError(f'Невалидное имя таблицы "{table}"')
-
-        # Подключение к БД и курсор
         conn = psycopg2.connect(
             host=os.getenv('DB_HOST'),
             dbname=os.getenv('DB_NAME'),
@@ -35,7 +30,7 @@ class Command(BaseCommand):
         with conn, conn.cursor() as cur:
             with open(path, 'r') as file:
                 reader = csv.reader(file)
-                next(reader)  # Пропускаем заголовок
+                next(reader)
                 for row in reader:
                     name, unit = row
                     cur.execute(

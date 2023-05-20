@@ -1,4 +1,5 @@
 # from django.shortcuts import get_object_or_404
+from django.db import transaction
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
@@ -6,7 +7,6 @@ from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
                             ShoppingCart, Tag)
 from recipes.validators import validate_ingredients, validate_tags
 from users.serializers import CustomUserSerializer
-from django.db import transaction
 
 
 class TagSerializer(serializers.ModelSerializer):
