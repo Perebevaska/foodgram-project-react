@@ -1,12 +1,6 @@
-import os
-
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.db.models import Sum
-from django.shortcuts import get_list_or_404, get_object_or_404
-from django.utils.translation import gettext_lazy as _
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from fpdf import FPDF
 from rest_framework import status, viewsets
@@ -82,48 +76,55 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return self.delete_relation(Favorite, user, pk, name)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @action(methods=['post', 'delete'], detail=True, url_path='shopping_cart',
-            url_name='shopping_cart')
+    @action(
+        methods=['post', 'delete'],
+        detail=True,
+        url_path='shopping_cart',
+        url_name='shopping_cart'
+    )
     def shopping_cart(self, request, pk=None):
-        """Добавление и удаление рецептов - Список покупок."""
         user = request.user
         if request.method == 'POST':
-            name = 'список покупок'
-            return self.add(ShoppingCart, user, pk, name)
-        if request.method == 'DELETE':
-            name = 'списка покупок'
-            return self.delete_relation(ShoppingCart, user, pk, name)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            return self._add_to_shopping_cart(user, pk)
+        elif request.method == 'DELETE':
+            return self._delete_from_shopping_cart(user, pk)
+        else:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def _add_to_shopping_cart(self, user, pk):
+        name = 'список покупок'
+        return self.add(ShoppingCart, user, pk, name)
+
+    def _delete_from_shopping_cart(self, user, pk):
+        name = 'списка покупок'
+        return self.delete_relation(ShoppingCart, user, pk, name)
 
     @action(methods=['get'], detail=False, url_path='download_shopping_cart',
             url_name='download_shopping_cart')
     def download_cart(self, request):
         """Формирование и скачивание списка покупок."""
         user = request.user
-        ingredients = get_list_or_404(
-            IngredientAmount.objects.filter(recipe__sh_cart__user=user)
-            .values('ingredient__name', 'ingredient__measurement_unit')
-            .annotate(total_amount=Sum('amount')))
+        ingredients = IngredientAmount.objects.filter(
+            recipe__sh_cart__user=user).values(
+                'ingredient__name', 'ingredient__measurement_unit').annotate(
+                    Sum('amount', distinct=True))
         pdf = FPDF()
         pdf.add_page()
         pdf.add_font(
-            'Shentox', '', os.path.join(
-                settings.BASE_DIR,
-                'fonts/Shentox.ttf'
-            ), uni=True)
+            'Shentox', '', './backend/fonts/Shentox.ttf', uni=True)
         pdf.set_font('Shentox', size=12)
-        pdf.cell(txt=_('Shopping List'), center=True)
-        pdf.ln(8)
+        pdf.cell(txt='Список покупок', center=True)
+        pdf.ln(10)
         for i, ingredient in enumerate(ingredients):
             name = ingredient['ingredient__name']
             unit = ingredient['ingredient__measurement_unit']
-            amount = ingredient['total_amount']
-            pdf.cell(30, 15, f'{i + 1}) {name} - {amount} {unit}')
+            amount = ingredient['amount__sum']
+            pdf.cell(30, 10, f'{i + 1}) {name} - {amount} {unit}')
             pdf.ln()
         file = pdf.output(dest='S')
-        filename = 'shopping_cart.pdf'
-        path = default_storage.save(filename, ContentFile(bytes(file)))
-        if not path:
-            raise ImproperlyConfigured(_('Could not save file %s') % filename)
-        url = default_storage.url(path)
-        return Response({'url': url}, status=status.HTTP_200_OK)
+        response = HttpResponse(
+            content_type='application/pdf', status=status.HTTP_200_OK)
+        response['Content-Disposition'] = (
+            'attachment; filename="список_покупок.pdf"')
+        response.write(bytes(file))
+        return response
